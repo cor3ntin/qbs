@@ -102,6 +102,24 @@ QString FileInfo::path(const QString &fp, HostOsInfo::HostOs hostOs)
     return p;
 }
 
+QString FileInfo::realPath(const QString &fp, HostOsInfo::HostOs hostOs)
+{
+    if (fp.isEmpty())
+        return QString();
+    QFileInfo info(fp);
+    QString p = fp;
+    if(info.isSymLink())
+        p = info.symLinkTarget();
+    p = QDir::cleanPath(p);
+    if (p.isEmpty() || (hostOs == HostOsInfo::HostOsWindows && p.length() == 2 && p.at(0).isLetter()
+            && p.at(1) == QLatin1Char(':'))) {
+        // Make sure we don't return Windows drive roots without an ending slash.
+        // Those paths are considered relative.
+        p.append(QLatin1Char('/'));
+    }
+    return p;
+}
+
 void FileInfo::splitIntoDirectoryAndFileName(const QString &filePath, QString *dirPath, QString *fileName)
 {
     int idx = filePath.lastIndexOf(QLatin1Char('/'));

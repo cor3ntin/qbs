@@ -69,6 +69,7 @@ public:
     static QString baseName(const QString &fp);
     static QString completeBaseName(const QString &fp);
     static QString path(const QString &fp, HostOsInfo::HostOs hostOs = HostOsInfo::hostOs());
+    static QString realPath(const QString &fp, HostOsInfo::HostOs hostOs = HostOsInfo::hostOs());
     static void splitIntoDirectoryAndFileName(const QString &filePath, QString *dirPath, QString *fileName);
     static void splitIntoDirectoryAndFileName(const QString &filePath, QStringRef *dirPath, QStringRef *fileName);
     static bool exists(const QString &fp);

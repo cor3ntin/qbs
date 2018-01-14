@@ -60,6 +60,7 @@ class FileInfoExtension : public QObject, QScriptable
 public:
     static QScriptValue js_ctor(QScriptContext *context, QScriptEngine *engine);
     static QScriptValue js_path(QScriptContext *context, QScriptEngine *engine);
+    static QScriptValue js_realPath(QScriptContext *context, QScriptEngine *engine);
     static QScriptValue js_fileName(QScriptContext *context, QScriptEngine *engine);
     static QScriptValue js_baseName(QScriptContext *context, QScriptEngine *engine);
     static QScriptValue js_cleanPath(QScriptContext *context, QScriptEngine *engine);
@@ -81,6 +82,8 @@ static void initializeJsExtensionFileInfo(QScriptValue extensionObject)
                                                   engine->newFunction(&FileInfoExtension::js_ctor));
     fileInfoObj.setProperty(QLatin1String("path"),
                             engine->newFunction(FileInfoExtension::js_path));
+    fileInfoObj.setProperty(QLatin1String("realPath"),
+                            engine->newFunction(FileInfoExtension::js_realPath));
     fileInfoObj.setProperty(QLatin1String("fileName"),
                             engine->newFunction(FileInfoExtension::js_fileName));
     fileInfoObj.setProperty(QLatin1String("baseName"),
@@ -129,6 +132,21 @@ QScriptValue FileInfoExtension::js_path(QScriptContext *context, QScriptEngine *
                 ? HostOsInfo::HostOsWindows : HostOsInfo::HostOsOtherUnix;
     }
     return FileInfo::path(context->argument(0).toString(), hostOs);
+}
+
+QScriptValue FileInfoExtension::js_realPath(QScriptContext *context, QScriptEngine *engine)
+{
+    Q_UNUSED(engine);
+    if (Q_UNLIKELY(context->argumentCount() < 1)) {
+        return context->throwError(QScriptContext::SyntaxError,
+                                   Tr::tr("realPath expects 1 argument"));
+    }
+    HostOsInfo::HostOs hostOs = HostOsInfo::hostOs();
+    if (context->argumentCount() > 1) {
+        hostOs = context->argument(1).toVariant().toStringList().contains(QLatin1String("windows"))
+                ? HostOsInfo::HostOsWindows : HostOsInfo::HostOsOtherUnix;
+    }
+    return FileInfo::realPath(context->argument(0).toString(), hostOs);
 }
 
 QScriptValue FileInfoExtension::js_fileName(QScriptContext *context, QScriptEngine *engine)
